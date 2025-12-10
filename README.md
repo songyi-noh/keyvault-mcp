@@ -106,6 +106,8 @@ AI:
 
 ## 📦 설치
 
+### macOS/Linux
+
 ```bash
 git clone https://github.com/songyi-noh/azure-keyvault-mcp.git
 cd azure-keyvault-mcp
@@ -114,6 +116,19 @@ source venv/bin/activate
 pip install -r requirements.txt
 az login
 ```
+
+### Windows
+
+```powershell
+git clone https://github.com/songyi-noh/azure-keyvault-mcp.git
+cd azure-keyvault-mcp
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+az login
+```
+
+> **참고:** Windows에서 Python이 설치되어 있지 않다면 [Python 공식 사이트](https://www.python.org/downloads/)에서 다운로드하세요.
 
 ## ⚙️ MCP 서버 설정
 
@@ -160,6 +175,32 @@ Claude Desktop에서도 이 MCP 서버를 사용할 수 있습니다.
   }
 }
 ```
+
+> **💡 Windows에서 경로 찾는 방법:**
+> 
+> 1. **PowerShell에서 경로 확인:**
+>    ```powershell
+>    cd C:\Users\YourName\azure-keyvault-mcp
+>    (Get-Location).Path
+>    ```
+> 
+> 2. **또는 파일 탐색기에서:**
+>    - 프로젝트 폴더를 열고 주소창을 클릭하면 전체 경로가 표시됩니다
+>    - 예: `C:\Users\YourName\azure-keyvault-mcp`
+> 
+> 3. **설정 파일 예시 (실제 경로):**
+>    ```json
+>    {
+>      "mcpServers": {
+>        "azure-keyvault": {
+>          "command": "C:\\Users\\YourName\\azure-keyvault-mcp\\venv\\Scripts\\python.exe",
+>          "args": ["C:\\Users\\YourName\\azure-keyvault-mcp\\server.py"]
+>        }
+>      }
+>    }
+>    ```
+> 
+>    > **중요:** Windows 경로에서는 백슬래시(`\`)를 두 개(`\\`)로 이스케이프해야 합니다.
 
 **Linux:**
 ```json
