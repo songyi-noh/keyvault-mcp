@@ -119,18 +119,55 @@ az login
 
 ### Windows
 
+**1단계: 프로젝트 클론**
 ```powershell
 git clone https://github.com/songyi-noh/azure-keyvault-mcp.git
 cd azure-keyvault-mcp
+```
+
+**2단계: venv 생성 (프로젝트 폴더 안에 생성됨)**
+```powershell
 python -m venv venv
+```
+
+> 이 명령을 실행하면 `azure-keyvault-mcp\venv\` 폴더가 생성됩니다.
+
+**3단계: venv 활성화**
+```powershell
 venv\Scripts\activate
+```
+
+> 활성화되면 프롬프트 앞에 `(venv)`가 표시됩니다.
+
+**4단계: 필요한 패키지 설치**
+```powershell
 pip install -r requirements.txt
+```
+
+**5단계: Azure 로그인**
+```powershell
 az login
 ```
 
-> **참고:** Windows에서 Python이 설치되어 있지 않다면 [Python 공식 사이트](https://www.python.org/downloads/)에서 다운로드하세요.
+> **참고:** 
+> - Windows에서 Python이 설치되어 있지 않다면 [Python 공식 사이트](https://www.python.org/downloads/)에서 다운로드하세요.
+> - Python 설치 시 "Add Python to PATH" 옵션을 체크하는 것을 권장합니다.
+> - `python` 명령이 작동하지 않으면 `py` 명령을 시도해보세요.
 
 ## ⚙️ MCP 서버 설정
+
+> **💡 venv란?**
+> 
+> `venv`는 **프로젝트 폴더 안에 생성되는 가상환경**입니다.
+> 
+> - **생성 위치:** 프로젝트 폴더 안의 `venv/` 디렉토리
+> - **생성 방법:** `python3 -m venv venv` 명령으로 생성
+> - **Python 경로:**
+>   - macOS/Linux: `프로젝트경로/venv/bin/python`
+>   - Windows: `프로젝트경로\venv\Scripts\python.exe`
+> - **왜 사용하나요?** 프로젝트별로 독립적인 Python 패키지 환경을 만들어 의존성 충돌을 방지합니다
+> 
+> MCP 설정에서 이 venv의 Python을 사용하여 `server.py`를 실행합니다.
 
 ### Cursor 설정
 
@@ -201,6 +238,92 @@ Claude Desktop에서도 이 MCP 서버를 사용할 수 있습니다.
 >    ```
 > 
 >    > **중요:** Windows 경로에서는 백슬래시(`\`)를 두 개(`\\`)로 이스케이프해야 합니다.
+
+### ⚠️ Windows에서 "지정된 경로를 찾을 수 없다" 오류 해결
+
+**문제 진단:**
+
+1. **Python 실행 파일 경로 확인:**
+   ```powershell
+   # 프로젝트 폴더에서 실행
+   cd C:\Users\YourName\azure-keyvault-mcp
+   
+   # venv의 Python이 존재하는지 확인
+   Test-Path venv\Scripts\python.exe
+   # True가 나와야 함
+   ```
+
+2. **server.py 파일 경로 확인:**
+   ```powershell
+   Test-Path server.py
+   # True가 나와야 함
+   ```
+
+3. **경로에 공백이나 특수문자가 있는지 확인:**
+   - 경로에 공백이 있으면 따옴표로 감싸야 할 수 있습니다
+   - 예: `C:\Users\My Name\azure-keyvault-mcp` → 경로에 공백 있음
+
+**해결 방법:**
+
+1. **슬래시 사용 (권장):**
+   ```json
+   {
+     "mcpServers": {
+       "azure-keyvault": {
+         "command": "C:/Users/YourName/azure-keyvault-mcp/venv/Scripts/python.exe",
+         "args": ["C:/Users/YourName/azure-keyvault-mcp/server.py"]
+       }
+     }
+   }
+   ```
+   > Windows에서도 슬래시(`/`)를 사용할 수 있습니다!
+
+2. **경로에 공백이 있는 경우:**
+   ```json
+   {
+     "mcpServers": {
+       "azure-keyvault": {
+         "command": "\"C:/Users/My Name/azure-keyvault-mcp/venv/Scripts/python.exe\"",
+         "args": ["C:/Users/My Name/azure-keyvault-mcp/server.py"]
+       }
+     }
+   }
+   ```
+
+3. **venv가 제대로 생성되었는지 확인:**
+   ```powershell
+   # venv 재생성
+   Remove-Item -Recurse -Force venv
+   python -m venv venv
+   venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+
+4. **절대 경로 대신 상대 경로 사용 (프로젝트 폴더 기준):**
+   ```json
+   {
+     "mcpServers": {
+       "azure-keyvault": {
+         "command": "python",
+         "args": ["-m", "venv", "venv", "&&", "venv\\Scripts\\python.exe", "server.py"]
+       }
+     }
+   }
+   ```
+   > 이 방법은 작동하지 않을 수 있으므로 **절대 경로 사용을 권장**합니다.
+
+**가장 확실한 방법:**
+
+PowerShell에서 다음 명령으로 정확한 경로를 복사하세요:
+```powershell
+cd C:\Users\YourName\azure-keyvault-mcp
+$pythonPath = (Resolve-Path "venv\Scripts\python.exe").Path
+$serverPath = (Resolve-Path "server.py").Path
+Write-Host "Python: $pythonPath"
+Write-Host "Server: $serverPath"
+```
+
+출력된 경로를 그대로 설정 파일에 복사하되, 백슬래시를 슬래시로 변경하거나 `\\`로 이스케이프하세요.
 
 **Linux:**
 ```json
