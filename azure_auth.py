@@ -291,17 +291,20 @@ class AzureAuthManager:
         # 실제 확인이 필요한 경우
         print("🔄 인증 상태 재확인 중...", file=sys.stderr)
         
-        # Azure CLI 설치 확인
+        # Azure CLI 설치 확인 (빠르게 실패하도록 짧은 타임아웃)
+        print("📋 Azure CLI 설치 확인 중...", file=sys.stderr)
         if not self._check_azure_cli_installed():
             self.is_authenticated = False
             self.credential = None
             self.auth_message = "Azure CLI가 설치되지 않았습니다.\n설치:  https://learn.microsoft.com/cli/azure/install-azure-cli"
+            print("❌ Azure CLI가 설치되지 않음", file=sys.stderr)
             return False
         
         # 로그인 상태 확인 (az account show 실행)
         # force_check가 True면 긴 타임아웃, False면 짧은 타임아웃 사용
+        print("🔍 Azure 로그인 상태 확인 중...", file=sys.stderr)
         try:
-            timeout = 30 if force_check else 10
+            timeout = 30 if force_check else 5  # 재확인 시에는 5초로 단축
             logged_in = self._check_logged_in(timeout_override=timeout)
         except Exception as e:
             print(f"⚠️ 로그인 상태 확인 중 오류: {str(e)}", file=sys.stderr)
@@ -311,9 +314,11 @@ class AzureAuthManager:
             self.is_authenticated = False
             self.credential = None
             self.auth_message = "Azure에 로그인되어 있지 않습니다.\n실행:  az login"
+            print("❌ Azure 로그인 안 됨", file=sys.stderr)
             return False
         
         # Credential 재초기화
+        print("🔐 Credential 초기화 중...", file=sys.stderr)
         try:
             from azure.identity import DefaultAzureCredential
             self.credential = DefaultAzureCredential()
@@ -325,5 +330,5 @@ class AzureAuthManager:
             self.is_authenticated = False
             self.credential = None
             self.auth_message = f"인증 초기화 실패: {str(e)}"
-            print(f"⚠️ Credential 초기화 실패: {str(e)}", file=sys.stderr)
+            print(f"❌ Credential 초기화 실패: {str(e)}", file=sys.stderr)
             return False

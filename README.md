@@ -187,6 +187,12 @@ az login
 
 Claude Desktop에서도 이 MCP 서버를 사용할 수 있습니다.
 
+> **💡 프로젝트별 규칙 설정:**
+> 
+> Cursor의 `.cursorrules`와 비슷하게, Claude Desktop에서도 프로젝트별 규칙을 설정할 수 있습니다:
+> - 프로젝트 루트에 `.claude` 파일을 생성하면 Claude Desktop이 자동으로 인식합니다
+> - `.cursorrules` 파일과 동일한 내용을 `.claude` 파일로 복사하여 사용할 수 있습니다
+
 **macOS:**
 ```json
 // ~/Library/Application Support/Claude/claude_desktop_config.json

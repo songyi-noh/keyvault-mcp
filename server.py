@@ -350,6 +350,8 @@ async def handle_call_tool(name: str, arguments: dict):
             if not auth_manager.is_authenticated:
                 # 한 번 더 체크 (사용자가 로그인했을 수 있음)
                 # force_check=False로 이미 인증된 경우 빠른 경로 사용
+                # 하지만 is_authenticated가 False이므로 빠른 경로를 통과하지 못하고
+                # 실제로 az account show를 실행하게 됨 (5초 타임아웃)
                 auth_manager.refresh_auth_status(force_check=False)
                 
                 # 여전히 안 되어 있으면 안내
